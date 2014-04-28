@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Haffa Tuben</string>
+    <string name="action_settings">Settings</string>
+    
+    <!-- Icons -->
+    <string name="icon_train">a</string>
+    <string name="icon_bus">b</string>
+    <string name="icon_subway">c</string>
+    <string name="icon_reverse">d</string>
+
+</resources>
