@@ -5,13 +5,13 @@
     android:orientation="vertical"
     android:padding="5dp" >
 
-   <EditText
+   <AutoCompleteTextView
        android:id="@+id/station_a"
        android:layout_width="fill_parent"
        android:layout_height="wrap_content"
        android:hint="@string/station_a_hint"
        android:inputType="text" />
-   <EditText
+   <AutoCompleteTextView
        android:id="@+id/station_b"
        android:layout_width="fill_parent"
        android:layout_height="wrap_content"
