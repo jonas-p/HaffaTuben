@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class DisplayRoutesFragment extends Fragment {
-
 	public DisplayRoutesFragment() {
 	}
 

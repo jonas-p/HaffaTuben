@@ -3,7 +3,9 @@
 
     <string name="app_name">Haffa Tuben</string>
     <string name="action_settings">Settings</string>
-    
+    <string name="button_add_route">Lägg till ny rutt</string>
+    <string name="station_a_hint">Station A</string>
+    <string name="station_b_hint">Station B</string>
     <!-- Icons -->
     <string name="icon_train">a</string>
     <string name="icon_bus">b</string>

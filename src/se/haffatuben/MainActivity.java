@@ -1,9 +1,11 @@
 package se.haffatuben;
 
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -36,5 +38,18 @@ public class MainActivity extends ActionBarActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	/**
+	 * This method is called from the UI when the user clicks
+	 * the add new route button and it launches the AddRoute fragment
+	 * to allow the user to add a new route.
+	 * 
+	 * @param view The view that invoked the method
+	 */
+	public void addRoute(View view) {
+		FragmentManager fm = getSupportFragmentManager();
+		AddRouteDialogFragment addRouteDialog = new AddRouteDialogFragment();
+		addRouteDialog.show(fm, "addroutedialog");
 	}
 }
