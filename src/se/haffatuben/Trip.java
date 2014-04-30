@@ -61,8 +61,6 @@ public class Trip {
 			String[] time = departureTime.split(":");
 			// Create Calendar object.
 			Calendar cal = Calendar.getInstance();
-			System.out.println(departureDate);
-			System.out.println(departureTime);
 			// Set date and time.
 			cal.set(Calendar.YEAR, Integer.parseInt(date[2]));
 			cal.set(Calendar.MONTH, Integer.parseInt(date[1]));
@@ -71,7 +69,6 @@ public class Trip {
 			cal.set(Calendar.MINUTE, Integer.parseInt(time[1]));
 			// Set date.
 			departure = cal.getTime();
-			System.out.println(departure.toString());
 			// Get Transport type.
 			String typeString = ((JSONObject) subTrip.get("Transport")).get("Type").toString();
 			// Set Type enum.
@@ -85,7 +82,7 @@ public class Trip {
 			lineString = ((JSONObject) subTrip.get("Transport")).get("Name").toString();
 			// Get line number.
 			lineNumber = ((JSONObject) subTrip.get("Transport")).get("Line").toString();
-			System.out.printf("Departure: %s; Line: %s %s; Type: %s\n", departure, lineString, lineNumber, type);
+			//System.out.printf("Departure: %s; Line: %s %s; Type: %s\n", departure, lineString, lineNumber, type);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

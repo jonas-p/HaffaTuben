@@ -11,6 +11,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.gson.Gson;
 
 /**
  * Route Model.
@@ -107,5 +108,30 @@ public class Route {
 					}
 				});
 		queue.add(jsObjReq);
+	}
+	
+	/**
+	 * Serializes object to JSON format using GSON.
+	 * @return Serialized String representation of object 
+	 * to store in ShardPreferences.
+	 */
+	public String serialize() {
+		// Create GSON object.
+		Gson gson = new Gson();
+		// Return string representation.
+		return gson.toJson(this);
+	}
+	
+	/**
+	 * Static method.
+	 * Creates a Route object from ShardPreferences serialized data.
+	 * @param String of with serialized data.
+	 * @return Route object.
+	 */
+	public static Route create(String serializedData) {
+		// Create GSON object.
+		Gson gson = new Gson();
+		// Return Route object.
+		return gson.fromJson(serializedData, Route.class);
 	}
 }
