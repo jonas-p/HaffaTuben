@@ -7,10 +7,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import android.app.AlertDialog;
@@ -31,9 +31,7 @@ import android.widget.AutoCompleteTextView;
  * DialogFragment for adding routes to the application. The
  * user specifies Station A and Station B.
  * 
- * TODO: Return Station objects
  * TODO: Fix so no request is fired when user selects a site (Reason: the textview gets changed)
- * TODO: Implement postive button
  * 
  * @author jonas
  *
@@ -43,16 +41,35 @@ public class AddRouteDialogFragment extends DialogFragment {
 	private static final String TAG = "AppRouteDialogFragment";
 	
 	// Volley request queue
-	private RequestQueue requestQueue;
-	HashMap<String, String> sitesMap;
-	ArrayList<String> sites;
+	protected RequestQueue requestQueue;
+	
+	// Sites
+	protected HashMap<String, JSONObject> sitesMap;
+	protected ArrayList<String> sites;
+	protected Station stationA;
+	protected Station stationB;
 	
 	// Autocompletion adapter
-	ArrayAdapter<String> adapter;
+	protected ArrayAdapter<String> adapter;
 	
 	public AddRouteDialogFragment() {
-		sitesMap = new HashMap<String, String>();
+		sitesMap = new HashMap<String, JSONObject>();
 		sites = new ArrayList<String>();
+	}
+	
+	/**
+	 * Interface to send the result from AddRouteDialogFragment
+	 * 
+	 * @author jonas
+	 *
+	 */
+	public interface AddRouteResultReciever {
+		/**
+		 * Called on positive result from AddRouteDialogFragment
+		 * @param a Station A
+		 * @param b Station B
+		 */
+		public void onAddRoutePositiveResult(Station a, Station b);
 	}
 	
 	@Override
@@ -63,30 +80,34 @@ public class AddRouteDialogFragment extends DialogFragment {
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		final View view = inflater.inflate(R.layout.fragment_addroutedialog, null);
 		
-		AutoCompleteTextView stationA = (AutoCompleteTextView) view.findViewById(R.id.station_a);
-		AutoCompleteTextView stationB = (AutoCompleteTextView) view.findViewById(R.id.station_b);
+		AutoCompleteTextView stationA_ac = (AutoCompleteTextView) view.findViewById(R.id.station_a);
+		AutoCompleteTextView stationB_ac = (AutoCompleteTextView) view.findViewById(R.id.station_b);
 		adapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_dropdown_item_1line, sites);
-		stationA.setAdapter(adapter);
-		stationB.setAdapter(adapter);
+		stationA_ac.setAdapter(adapter);
+		stationB_ac.setAdapter(adapter);
 
-		stationA.setOnItemClickListener(new OnItemClickListener() {
+		stationA_ac.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO: Error checking if item does not exist
 				String selected = adapter.getItem(position);
-				Log.d(TAG, "Station A: Selected " + selected + "(" + sitesMap.get(selected) + ")");
+				
+				stationA = new Station(sitesMap.get(selected));
+				// TODO: Check if should enable OK button
 			}
 		});
 		
-		stationB.setOnItemClickListener(new OnItemClickListener() {
+		stationB_ac.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO: Error checking if item does not exist
 				String selected = adapter.getItem(position);
-				Log.d(TAG, "Station B: Selected " + selected + "(" + sitesMap.get(selected) + ")");
+				
+				stationB = new Station(sitesMap.get(selected));
+				// TODO: Check if should enable OK button
 			}
 		});
 		
@@ -98,8 +119,8 @@ public class AddRouteDialogFragment extends DialogFragment {
 			}
 		};
 		
-		stationA.addTextChangedListener(watcher);
-		stationB.addTextChangedListener(watcher);
+		stationA_ac.addTextChangedListener(watcher);
+		stationB_ac.addTextChangedListener(watcher);
 		
 		// Create dialog
 		Builder dialog = new AlertDialog.Builder(getActivity());
@@ -112,8 +133,10 @@ public class AddRouteDialogFragment extends DialogFragment {
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						// TODO: Create route object and save to storage
-						Log.d(TAG, AddRouteDialogFragment.class.getName() + ": Positive button not yet implemented!");
+						// Send result to activity
+						if (getActivity() instanceof AddRouteResultReciever) {
+							((AddRouteResultReciever) getActivity()).onAddRoutePositiveResult(stationA, stationB);
+						}
 					}
 				});
 		dialog.setNegativeButton(android.R.string.cancel,
@@ -136,61 +159,52 @@ public class AddRouteDialogFragment extends DialogFragment {
 	 */
 	protected void updateSites(final String query) {
 		// TODO: Move to config
-		String url = "https://api.trafiklab.se/sl/realtid/GetSite.json?key=PFGie3SkJrJKTIRtg01wWAxABIRsfFYQ&stationSearch=" + query;
+		String url = "https://api.trafiklab.se/samtrafiken/resrobot/FindLocation.json?key=94TSOTStVjWwbNWMnYFSGGzRGbA3nlGq&coordSys=WGS84&apiVersion=2.1&from=" + query;
 		
 		// Cancel all previous requests
 		requestQueue.cancelAll(REQUEST_TAG);
 		
 		if (query.length() == 0) return;
-		JsonObjectRequest req = new JsonObjectRequest(url, null,
+
+		JsonRequestISO req = new JsonRequestISO(Method.GET, url, null,
 				new Response.Listener<JSONObject>() {
-					@Override
-					public void onResponse(JSONObject response) {
-						sitesMap.clear();
-						adapter.clear();
-						
-						try {
-							Object jsonSites = response.getJSONObject("Hafas")
-									.getJSONObject("Sites").get("Site");
+			@Override
+			public void onResponse(JSONObject response) {
+				sitesMap.clear();
+				adapter.clear();
+				
+				try {
+					JSONObject jsonSites = response.getJSONObject("findlocationresult")
+							.getJSONObject("from");
+					
+					if (jsonSites.has("location")) {
+						JSONArray sites = jsonSites.getJSONArray("location");
+						for (int i = 0; i < sites.length(); i++) {
+							JSONObject site = sites.getJSONObject(i);
+							String name = site.getString("displayname");
 							
-							if (jsonSites instanceof JSONObject) {
-								// One site
-								JSONObject jsonSite = (JSONObject) jsonSites;
-								String name = jsonSite.getString("Name");
-								String number = jsonSite.getString("Number");
-								
-								adapter.add(name);
-								sitesMap.put(name, number);
-							} else {
-								// Multiple sites
-								JSONArray jsonSitesArray = (JSONArray) jsonSites;
-								for (int i = 0; i < jsonSitesArray.length(); i++) {
-									JSONObject site = jsonSitesArray.getJSONObject(i);
-									String name = site.getString("Name");
-									String number = site.getString("Number");
-									
-									adapter.add(name);
-									sitesMap.put(name, number);
-								}
-							}
-						} catch (JSONException e) {
-							// TODO: Error parsing
-							Log.d(TAG, "Error parsing");
+							adapter.add(name);
+							sitesMap.put(name, site);
 						}
-						
-						// Update view
-						adapter.notifyDataSetChanged();
-						adapter.getFilter().filter(query);
 					}
-				},
-				new Response.ErrorListener() {
-					@Override
-					public void onErrorResponse(VolleyError error) {
-						// TODO: Display error message
-						Log.d(TAG, error.toString());
-					}
-				});
-		
+				} catch (JSONException e) {
+					// TODO: Error parsing
+					Log.d(TAG, "Error parsing");
+				}
+				
+				// Update view
+				adapter.notifyDataSetChanged();
+				adapter.getFilter().filter(query);
+			}
+		},
+		new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				// TODO: Display error message
+				Log.d(TAG, error.toString());
+			}
+		});
+
 		req.setTag(REQUEST_TAG);
 		requestQueue.add(req);
 		Log.d(TAG, "Typeahead request sent");
