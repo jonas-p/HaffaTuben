@@ -1,13 +1,15 @@
 package se.haffatuben;
 
+import se.haffatuben.AddRouteDialogFragment.AddRouteResultReciever;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements AddRouteResultReciever {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,5 +53,12 @@ public class MainActivity extends ActionBarActivity {
 		FragmentManager fm = getSupportFragmentManager();
 		AddRouteDialogFragment addRouteDialog = new AddRouteDialogFragment();
 		addRouteDialog.show(fm, "addroutedialog");
+	}
+	
+	/**
+	 * This method handles positive result from the addRouteDialogFragment.
+	 */
+	public void onAddRoutePositiveResult(Station a, Station b) {
+		Log.d(getString(R.string.app_name), "Station A: " + a.name + " Station B: " + b.name);
 	}
 }
