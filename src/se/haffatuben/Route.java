@@ -82,7 +82,7 @@ public class Route {
 		// Build request URL.
 		String url = buildRequestURL(reverse);
 		// Make request.
-		JsonObjectRequest jsObjReq = new JsonObjectRequest(Request.Method.GET, url, null,
+		JsonRequestISO jsObjReq = new JsonRequestISO(Request.Method.GET, url, null,
 				new Response.Listener<JSONObject>() {
 					// On response from API.
 					@Override
