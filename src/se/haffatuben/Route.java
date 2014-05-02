@@ -22,8 +22,6 @@ import com.google.gson.Gson;
  * @field ArrayList<Trip> trips
  */
 public class Route {
-	// Route id.
-	public String id;
 	// Stations a, b.
 	public Station a, b;
 	// ArrayList for Trip storage.
@@ -35,9 +33,8 @@ public class Route {
 	 * @param Station a.
 	 * @param Station b. 
 	 */
-	public Route(String id, Station a, Station b) {
+	public Route(Station a, Station b) {
 		// Set fields.
-		this.id = id;
 		this.a = a;
 		this.b = b;
 	}

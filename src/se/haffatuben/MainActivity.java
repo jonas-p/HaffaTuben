@@ -60,5 +60,13 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 	 */
 	public void onAddRoutePositiveResult(Station a, Station b) {
 		Log.d(getString(R.string.app_name), "Station A: " + a.name + " Station B: " + b.name);
+		// RoutePreferences.
+		RoutePreferences rp = new RoutePreferences(getApplicationContext());
+		// Create Route object.
+		Route r = new Route(a, b);
+		// Serialize Route object.
+		String routeString = r.serialize();
+		// Put in SharedPreferences.
+		rp.addRoute(routeString);
 	}
 }
