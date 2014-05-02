@@ -51,20 +51,22 @@ public class Route {
 		// URL String.
 		StringBuilder url = new StringBuilder();
 		// Base URL.
-		String base = "https://api.trafiklab.se/sl/reseplanerare.json?";
+		String base = "https://api.trafiklab.se/samtrafiken/resrobot/Search.json?";
 		// URL Params.
 		String apiKey = "key=Zi5RGn9ZKWfqNxCZxvGdjMz6dErIf3Dr";
 		// If reverse, change a, b.
 		String stations;
 		if (reverse) {
-			stations = "&S=" + b.id + "&Z=" + a.id;
+			stations = "&fromId=" + b.id + "&toId=" + a.id;
 		} else {
-			stations = "&S=" + a.id + "&Z=" + b.id;
+			stations = "&fromId=" + a.id + "&toId=" + b.id;
 		}
+		String options = "&searchType=T&coordSys=WGS84&apiVersion=2.1";
 		// Build URL.
 		url.append(base);
 		url.append(apiKey);
 		url.append(stations);
+		url.append(options);
 		return url.toString();
 	}
 	
@@ -87,14 +89,19 @@ public class Route {
 					public void onResponse(JSONObject response) {
 						// Get Trips array.
 						try {
-							JSONArray tripArray = ((JSONObject) response.get("HafasResponse")).getJSONArray("Trip");
+							JSONArray tripArray = ((JSONObject) response.get("timetableresult")).getJSONArray("ttitem");
 							// Iterate Trips and create Trip objects. Add objects to trips list.
 							for (int i = 0; i < tripArray.length(); i++) {
+								// If mode is Walk. Skip.
+								String mode = (String) tripArray.getJSONObject(i).getJSONObject("segment").getJSONObject("segmentid").getJSONObject("mot").get("@displaytype");
+								if (mode.equals("G")) {
+									continue;
+								}
 								// New object.
 								Trip t = new Trip((JSONObject) tripArray.get(i));
 								// Append to trips.
 								trips.add(t);
-							}
+							}	
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
