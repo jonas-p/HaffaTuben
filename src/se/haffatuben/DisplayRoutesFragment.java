@@ -1,6 +1,7 @@
 package se.haffatuben;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,10 +16,28 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class DisplayRoutesFragment extends Fragment {
-	private ListView mListView;
-	private ArrayList<RouteListItem> mData;
+	private ListView listView;
+	private List<RouteListItem> routes;
+	private RouteArrayAdapter adapter;
 	
 	public DisplayRoutesFragment() {
+		routes = new ArrayList<RouteListItem>();
+	}
+	
+	/**
+	 * Sets routes list to display in list view. This method will call
+	 * notifyRoutesDataChanged when done.
+	 * @param routes
+	 */
+	public void setRoutes(List<RouteListItem> routes) {
+		this.routes = routes;
+	}
+	
+	/**
+	 * Notify list view adapter that the data source has changed
+	 */
+	public void notifyRoutesDataChanged() {
+		adapter.notifyDataSetChanged();
 	}
 
 	@Override
@@ -27,18 +46,11 @@ public class DisplayRoutesFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_displayroutes, container,
 				false);
 		
-		// TODO: Load routes from main activity
-		mData = new ArrayList<>();
-		mData.add(new RouteListItem(new Route(new Station("Midsommarkransen", "1", 0.0, 0.0),
-				new Station("Hornstull", "2", 0.0, 0.0))));
-		mData.add(new RouteListItem(new Route(new Station("Liljeholmen", "1", 0.0, 0.0),
-				new Station("Karlaplan", "2", 0.0, 0.0))));
+		adapter = new RouteArrayAdapter(getActivity(), R.layout.route_list_parent, routes);
 		
-		RouteArrayAdapter adapter = new RouteArrayAdapter(getActivity(), R.layout.route_list_parent, mData);
-		
-		mListView = (ListView) rootView.findViewById(R.id.listView);
-		mListView.setAdapter(adapter);
-		mListView.setOnItemClickListener(new OnItemClickListener() {
+		listView = (ListView) rootView.findViewById(R.id.listView);
+		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new OnItemClickListener() {
 			
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -46,7 +58,7 @@ public class DisplayRoutesFragment extends Fragment {
 				
 				final View ev = (View) view.findViewById(R.id.expandableView);
 				if (ev.getVisibility() == View.VISIBLE) {
-					mData.get(position).setExpanded(false);
+					routes.get(position).setExpanded(false);
 					
 					final int initialHeight = ev.getMeasuredHeight();
 					Animation a = new Animation() {
@@ -69,7 +81,7 @@ public class DisplayRoutesFragment extends Fragment {
 					a.setDuration(250);
 					ev.startAnimation(a);
 				} else {
-					mData.get(position).setExpanded(true);
+					routes.get(position).setExpanded(true);
 					
 					ev.measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 					final int targetHeight = ev.getMeasuredHeight();
