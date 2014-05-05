@@ -85,8 +85,13 @@ public class RouteListItem {
 				
 		LinearLayout expandableLayout = (LinearLayout) view.findViewById(R.id.expandableView);
 		
-		// Populate child views.
-		for (int i = firstPosition; i < route.trips.size() - firstPosition; i++) {
+		// Populate child views. Skip first.
+		firstPosition++;
+		int lastPosition = route.trips.size() - firstPosition + 1;
+		if (lastPosition - firstPosition > 3) {
+			lastPosition = firstPosition + 3;
+		}
+		for (int i = firstPosition; i < lastPosition; i++) {
 			expandableLayout.addView(getChild(context, expandableLayout, i));
 		}
 	}
@@ -105,11 +110,12 @@ public class RouteListItem {
 		// Get text views.
 		TextView title = (TextView) view.findViewById(R.id.title);
 		TextView departureTime = (TextView) view.findViewById(R.id.departureTime);
+		TextView icon = (TextView) view.findViewById(R.id.icon);
 		
 		// Set text views.
 		title.setText(route.b.name.replaceAll("\\(.+", ""));
 		departureTime.setText((route.trips.get(position).departure.getTime() - System.currentTimeMillis())/60000 + "min");
-		
+		icon.setText(route.trips.get(position).type.iconString);
 		return view;
 	}
 }

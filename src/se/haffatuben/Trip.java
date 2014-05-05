@@ -24,7 +24,7 @@ public class Trip {
 	 * Represents different travel types.
 	 */
 	public enum Type {
-		BUS("Icon"), METRO("Icon"), COMMUTE("Icon"), FERRY("Icon");
+		BUS("b"), METRO("c"), COMMUTE("a"), FERRY("");
 		
 		public final String iconString;
 		
