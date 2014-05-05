@@ -62,7 +62,7 @@ public class RouteListItem {
 		
 		// TODO: Use strings from strings.xml
 		textView.setText(route.b.name.replaceAll("\\(.+", ""));
-		textView2.setText("från " + route.a.name.replaceAll("\\(.+", ""));
+		textView2.setText(context.getString(R.string.from) + " " + route.a.name.replaceAll("\\(.+", ""));
 		
 		// Check if there is any trips.
 		if (route.trips.size() == 0) {
@@ -114,7 +114,7 @@ public class RouteListItem {
 		
 		// Set text views.
 		title.setText(route.b.name.replaceAll("\\(.+", ""));
-		departureTime.setText((route.trips.get(position).departure.getTime() - System.currentTimeMillis())/60000 + "min");
+		departureTime.setText((route.trips.get(position).departure.getTime() - System.currentTimeMillis())/60000 + " min");
 		icon.setText(route.trips.get(position).type.iconString);
 		return view;
 	}
