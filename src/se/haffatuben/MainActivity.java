@@ -3,7 +3,6 @@ package se.haffatuben;
 import java.util.ArrayList;
 import java.util.Map;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
 import se.haffatuben.AddRouteDialogFragment.AddRouteResultReciever;
