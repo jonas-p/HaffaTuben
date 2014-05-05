@@ -135,6 +135,9 @@ public class Route {
 						rc.onRouteFailed(new Error("API Connection failed."));
 					}
 				});
+		// turn off caching
+		jsObjReq.setShouldCache(false);
+		// add to queue
 		queue.add(jsObjReq);
 	}
 	
