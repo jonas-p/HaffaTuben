@@ -61,7 +61,7 @@ public class Trip {
 			else if (typeString.equals("F")) {type = Type.FERRY; }
 			// Set line number.
 			lineNumber = trip.getJSONObject("segment").getJSONObject("segmentid").getJSONObject("carrier").get("number").toString();
-			System.out.printf("Departure: %s; Line: %s; Type: %s\n", departure, lineNumber, type);
+			//System.out.printf("Departure: %s; Line: %s; Type: %s\n", departure, lineNumber, type);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
