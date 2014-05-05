@@ -23,7 +23,13 @@ public class Trip {
 	 * Represents different travel types.
 	 */
 	public enum Type {
-		BUS, METRO, COMMUTE, FERRY;
+		BUS("Icon"), METRO("Icon"), COMMUTE("Icon"), FERRY("Icon");
+		
+		public final String iconString;
+		
+		Type(String iconString) {
+			this.iconString = iconString;
+		}
 	}
 
 	// Type of Trip. Metro, Bus etc.
@@ -64,10 +70,8 @@ public class Trip {
 			//System.out.printf("Departure: %s; Line: %s; Type: %s\n", departure, lineNumber, type);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 }

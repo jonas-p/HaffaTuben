@@ -56,18 +56,39 @@ public class RouteListItem {
 	 * @param view
 	 */
 	public void updateView(Context context, View view) {
-		TextView textView = (TextView) view.findViewById(R.id.textView);
-		TextView textView2 = (TextView) view.findViewById(R.id.textView2);
+		TextView textView = (TextView) view.findViewById(R.id.destination);
+		TextView textView2 = (TextView) view.findViewById(R.id.origin);
+		TextView textView3 = (TextView) view.findViewById(R.id.departureTime);
 		
 		// TODO: Use strings from strings.xml
-		textView.setText(route.b.name);
-		textView2.setText("frÃ¥n " + route.a.name);
+		textView.setText(route.b.name.replaceAll("\\(.+", ""));
+		textView2.setText("frŒn " + route.a.name.replaceAll("\\(.+", ""));
+		
+		// Check if there is any trips.
+		if (route.trips.size() == 0) {
+			return;
+		}
+		// Time delta.
+		long timeDelta = 0;
+		// First position of trips.
+		int firstPosition = 0;
+		// Get first departure time with delta > 0.
+		for (int i = 0; i < route.trips.size(); i++) {
+			timeDelta = (route.trips.get(i).departure.getTime() - System.currentTimeMillis())/60000;
+			if (timeDelta >= 0) { 
+				firstPosition = i;
+				break; 
+			}
+		}
+		// Set first departure time.
+		textView3.setText(timeDelta+" min");
 				
 		LinearLayout expandableLayout = (LinearLayout) view.findViewById(R.id.expandableView);
-
-		expandableLayout.addView(getChild(context, expandableLayout, 0));
-		expandableLayout.addView(getChild(context, expandableLayout, 1));
-		expandableLayout.addView(getChild(context, expandableLayout, 2));
+		
+		// Populate child views.
+		for (int i = firstPosition; i < route.trips.size() - firstPosition; i++) {
+			expandableLayout.addView(getChild(context, expandableLayout, i));
+		}
 	}
 	
 	/**
@@ -81,9 +102,13 @@ public class RouteListItem {
 	private View getChild(Context context, ViewGroup parent, int position) {
 		LayoutInflater inflater = ((Activity) context).getLayoutInflater();
 		View view = inflater.inflate(R.layout.route_list_child, parent, false);
-		
+		// Get text views.
 		TextView title = (TextView) view.findViewById(R.id.title);
-		title.setText(route.b.name);
+		TextView departureTime = (TextView) view.findViewById(R.id.departureTime);
+		
+		// Set text views.
+		title.setText(route.b.name.replaceAll("\\(.+", ""));
+		departureTime.setText((route.trips.get(position).departure.getTime() - System.currentTimeMillis())/60000 + "min");
 		
 		return view;
 	}
