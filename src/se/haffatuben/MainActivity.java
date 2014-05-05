@@ -1,6 +1,13 @@
 package se.haffatuben;
 
+import java.util.ArrayList;
+import java.util.Map;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+
 import se.haffatuben.AddRouteDialogFragment.AddRouteResultReciever;
+import se.haffatuben.Route.RouteLoadedReciever;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,7 +17,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 public class MainActivity extends ActionBarActivity implements AddRouteResultReciever {
-
+	// ArrayList containing Route objects.
+	ArrayList<Route> routes;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -19,6 +28,34 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		if (savedInstanceState == null) {
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.container, new DisplayRoutesFragment()).commit();
+		}
+		// Load Routes.
+		RoutePreferences rp = new RoutePreferences(getApplicationContext());
+		Map<String, ?> routeMap = rp.getRoutes();
+		// Load Route objects.
+		routes = new ArrayList<Route>();
+		for (Map.Entry<String, ?> entry : routeMap.entrySet()) {
+			routes.add(Route.create((String) entry.getValue()));
+		}
+		// Load trips for all routes.
+		boolean reverse = false;
+		for (Route route : routes) {
+			route.loadTrips(Volley.newRequestQueue(this), reverse, new RouteLoadedReciever() {
+				
+				@Override
+				public void onRouteLoaded(Route r) {
+					// TODO Call refresh.
+					System.out.println(r.trips);
+					Log.d("", "Trip loaded");
+				}
+				
+				@Override
+				public void onRouteFailed(Error e) {
+					// TODO Android toast.
+					Log.d("", "Trip load failed");
+				}
+				
+			});
 		}
 	}
 

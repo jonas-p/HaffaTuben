@@ -39,6 +39,21 @@ public class Route {
 		this.b = b;
 	}
 	
+	/**
+	 * Interface for RouteLoadedReciever.
+	 */
+	public interface RouteLoadedReciever {
+		
+		/**
+		 * Callback on success.
+		 */
+		public void onRouteLoaded(Route r);
+		/**
+		 * Callback on fail.
+		 */
+		public void onRouteFailed(Error e);
+	}
+	
 	/** buildRequestURL.
 	 * Creates a SL API request URL.
 	 * @param boolean reverse.
@@ -69,13 +84,13 @@ public class Route {
 	
 	/**
 	 * Load Trips from SL API.
-	 * Calls TripLoadedReciever.onTripLoaded(this) on success.
-	 * Calls TripLoadedReciever.onTripFailed(VolleyError error) on fail.
+	 * Calls RouteLoadedReciever.onRouteLoaded(this) on success.
+	 * Calls RouteLoadedReciever.onRouteFailed(VolleyError error) on fail.
 	 * @param Interface TripLoadedReciever.
 	 * @param RequestQueue queue.
 	 * @param Boolean reverse.
 	 */
-	public void loadTrips(RequestQueue queue, boolean reverse) {
+	public void loadTrips(RequestQueue queue, boolean reverse, final RouteLoadedReciever rc) {
 		// Build request URL.
 		String url = buildRequestURL(reverse);
 		// Make request.
@@ -98,17 +113,19 @@ public class Route {
 								Trip t = new Trip((JSONObject) tripArray.get(i));
 								// Append to trips.
 								trips.add(t);
-							}	
+							}
+							// Callback.
+							rc.onRouteLoaded(Route.this);
 						} catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							// Fail.
+							rc.onRouteFailed(new Error("Could not parse JSON data."));
 						}
 					}
 				}, new Response.ErrorListener() {
 					// On fail from API.
 					@Override
 					public void onErrorResponse(VolleyError error) {
-						System.out.println(error.toString());
+						rc.onRouteFailed(new Error("API Connection failed."));
 					}
 				});
 		queue.add(jsObjReq);
