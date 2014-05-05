@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements AddRouteResultReciever {
 	// ArrayList containing Route objects.
@@ -21,6 +22,23 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 	ArrayList<RouteListItem> routeListItems;
 	// DisplayRoutesFragment.
 	DisplayRoutesFragment displayRoutesFragment;
+	
+	// RouteLoadedReciever.
+	RouteLoadedReciever rc = new RouteLoadedReciever() {
+		
+		@Override
+		public void onRouteLoaded(Route r) {
+			// Notify fragment.
+			displayRoutesFragment.notifyRoutesDataChanged();
+		}
+		
+		@Override
+		public void onRouteFailed(Error e) {
+			// Toast.
+			Toast toast = Toast.makeText(getApplicationContext(), "Resor kunde inte hämtas", Toast.LENGTH_SHORT);
+			toast.show();
+		}
+	};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,26 +65,9 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		// Send routes to view.
 		displayRoutesFragment.setRoutes(routeListItems);
 		// Load trips for all routes.
-		// TODO: Set reverse.
-		boolean reverse = false;
+		boolean reverse = false; // TODO
 		for (Route route : routes) {
-			route.loadTrips(Volley.newRequestQueue(this), reverse, new RouteLoadedReciever() {
-				
-				@Override
-				public void onRouteLoaded(Route r) {
-					// Notify fragment.
-					displayRoutesFragment.notifyRoutesDataChanged();
-					System.out.println(r.trips);
-					Log.d("", "Trip loaded");
-				}
-				
-				@Override
-				public void onRouteFailed(Error e) {
-					// TODO Android toast.
-					Log.d("", "Trip load failed");
-				}
-				
-			});
+			route.loadTrips(Volley.newRequestQueue(this), reverse, rc);
 		}
 	}
 
@@ -120,5 +121,8 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		routeListItems.add(new RouteListItem(r));
 		// Notify.
 		displayRoutesFragment.notifyRoutesDataChanged();
+		// Load trips.
+		boolean reverse = false; // TODO
+		r.loadTrips(Volley.newRequestQueue(this), reverse, rc);
 	}
 }
