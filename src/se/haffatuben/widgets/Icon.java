@@ -3,7 +3,7 @@ package se.haffatuben.widgets;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.widget.Button;
+import android.widget.TextView;
 
 /**
  * IconButton represents a button with icons contained in "icons.ttf"
@@ -13,25 +13,25 @@ import android.widget.Button;
  * @author jonas
  *
  */
-public class IconButton extends Button {
+public class Icon extends TextView {
 	/**
 	 * Public constructor
 	 */
-	public IconButton(Context context) {
+	public Icon(Context context) {
 		super(context);
 	}
 	
 	/**
 	 * Public constructor
 	 */
-	public IconButton(Context context, AttributeSet attrs) {
+	public Icon(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 	
 	/**
 	 * Public constructor
 	 */
-	public IconButton(Context context, AttributeSet attrs, int defStyle) {
+	public Icon(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
 	
