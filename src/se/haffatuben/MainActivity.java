@@ -19,15 +19,19 @@ import android.view.View;
 public class MainActivity extends ActionBarActivity implements AddRouteResultReciever {
 	// ArrayList containing Route objects.
 	ArrayList<Route> routes;
+	// DisplayRoutesFragment.
+	DisplayRoutesFragment displayRoutesFragment;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		// Initialize DisplayRoutesFragment.
+		displayRoutesFragment = new DisplayRoutesFragment();
 
 		if (savedInstanceState == null) {
 			getSupportFragmentManager().beginTransaction()
-					.add(R.id.container, new DisplayRoutesFragment()).commit();
+					.add(R.id.container, displayRoutesFragment).commit();
 		}
 		// Load Routes.
 		RoutePreferences rp = new RoutePreferences(getApplicationContext());
@@ -38,6 +42,7 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 			routes.add(Route.create((String) entry.getValue()));
 		}
 		// Load trips for all routes.
+		// TODO: Set reverse.
 		boolean reverse = false;
 		for (Route route : routes) {
 			route.loadTrips(Volley.newRequestQueue(this), reverse, new RouteLoadedReciever() {
