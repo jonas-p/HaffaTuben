@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +58,9 @@ public class Trip {
 			// Get departure date.
 			String departureString = (String) trip.getJSONObject("segment").getJSONObject("departure").get("datetime");
 			// Format and create date object.
-			departure = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).parse(departureString);
+			SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+			isoFormat.setTimeZone(TimeZone.getTimeZone("Europe/Stockholm"));
+			departure = isoFormat.parse(departureString);
 			// Get transport type.
 			String typeString = (String) trip.getJSONObject("segment").getJSONObject("segmentid").getJSONObject("mot").get("@displaytype");
 			// Set Type enum.
