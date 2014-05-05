@@ -19,6 +19,7 @@ import android.view.View;
 public class MainActivity extends ActionBarActivity implements AddRouteResultReciever {
 	// ArrayList containing Route objects.
 	ArrayList<Route> routes;
+	ArrayList<RouteListItem> routeListItems;
 	// DisplayRoutesFragment.
 	DisplayRoutesFragment displayRoutesFragment;
 	
@@ -38,9 +39,14 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		Map<String, ?> routeMap = rp.getRoutes();
 		// Load Route objects.
 		routes = new ArrayList<Route>();
+		routeListItems = new ArrayList<RouteListItem>();
 		for (Map.Entry<String, ?> entry : routeMap.entrySet()) {
-			routes.add(Route.create((String) entry.getValue()));
+			Route r = Route.create((String) entry.getValue());
+			routes.add(r);
+			routeListItems.add(new RouteListItem(r));
 		}
+		// Send routes to view.
+		displayRoutesFragment.setRoutes(routeListItems);
 		// Load trips for all routes.
 		// TODO: Set reverse.
 		boolean reverse = false;
@@ -49,7 +55,8 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 				
 				@Override
 				public void onRouteLoaded(Route r) {
-					// TODO Call refresh.
+					// Notify fragment.
+					displayRoutesFragment.notifyRoutesDataChanged();
 					System.out.println(r.trips);
 					Log.d("", "Trip loaded");
 				}
@@ -109,5 +116,10 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		String routeString = r.serialize();
 		// Put in SharedPreferences.
 		rp.addRoute(routeString);
+		// Append to route lists.
+		routes.add(r);
+		routeListItems.add(new RouteListItem(r));
+		// Notify.
+		displayRoutesFragment.notifyRoutesDataChanged();
 	}
 }
