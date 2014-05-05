@@ -25,6 +25,9 @@ public class Route {
 	public Station a, b;
 	// ArrayList for Trip storage.
 	public ArrayList<Trip> trips = new ArrayList<Trip>();
+	// isLoading, returns true when object is loading trips
+	// default value is true
+	public boolean isLoading;
 	
 	/** Route.
 	 * Route constructor.
@@ -36,6 +39,7 @@ public class Route {
 		// Set fields.
 		this.a = a;
 		this.b = b;
+		this.isLoading = true;
 	}
 	
 	/**
@@ -90,6 +94,7 @@ public class Route {
 	 * @param Boolean reverse.
 	 */
 	public void loadTrips(RequestQueue queue, boolean reverse, final RouteLoadedReciever rc) {
+		isLoading = true;
 		// Build request URL.
 		String url = buildRequestURL(reverse);
 		// Make request.
@@ -114,9 +119,11 @@ public class Route {
 								trips.add(t);
 							}
 							// Callback.
+							isLoading = false;
 							rc.onRouteLoaded(Route.this);
 						} catch (JSONException e) {
 							// Fail.
+							isLoading = false;
 							rc.onRouteFailed(new Error("Could not parse JSON data."));
 						}
 					}
@@ -124,6 +131,7 @@ public class Route {
 					// On fail from API.
 					@Override
 					public void onErrorResponse(VolleyError error) {
+						isLoading = false;
 						rc.onRouteFailed(new Error("API Connection failed."));
 					}
 				});
