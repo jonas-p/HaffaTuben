@@ -14,11 +14,13 @@ import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
 
 public class DisplayRoutesFragment extends Fragment {
 	private ListView listView;
 	private List<RouteListItem> routes;
 	private RouteArrayAdapter adapter;
+	private View rootView;
 	
 	public DisplayRoutesFragment() {
 		routes = new ArrayList<RouteListItem>();
@@ -43,7 +45,7 @@ public class DisplayRoutesFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_displayroutes, container,
+		rootView = inflater.inflate(R.layout.fragment_displayroutes, container,
 				false);
 		
 		adapter = new RouteArrayAdapter(getActivity(), R.layout.route_list_parent, routes);
@@ -51,13 +53,16 @@ public class DisplayRoutesFragment extends Fragment {
 		listView = (ListView) rootView.findViewById(R.id.listView);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new OnItemClickListener() {
-			
+
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				
 				final View ev = (View) view.findViewById(R.id.expandableView);
 				if (ev.getVisibility() == View.VISIBLE) {
+					// Hide trash icon.
+					view.findViewById(R.id.trash).setVisibility(View.GONE);
+					
 					routes.get(position).setExpanded(false);
 					
 					final int initialHeight = ev.getMeasuredHeight();
@@ -82,6 +87,8 @@ public class DisplayRoutesFragment extends Fragment {
 					ev.startAnimation(a);
 				} else {
 					routes.get(position).setExpanded(true);
+					// Show trash icon.
+					view.findViewById(R.id.trash).setVisibility(View.VISIBLE);
 					
 					ev.measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 					final int targetHeight = ev.getMeasuredHeight();

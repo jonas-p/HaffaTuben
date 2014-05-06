@@ -21,16 +21,14 @@ public class RoutePreferences {
 	 
 	 /**
 	  * Adds a serialized route to SharedPreferences.
+	  * @param Route id.
 	  * @param Serialized route 
 	  */
-	 public void addRoute(String route) {
-		 // Generate UUID.
-		 Long routeLongId = UUID.randomUUID().getMostSignificantBits();
-		 String routeId = Long.toString(routeLongId);
+	 public void addRoute(String id, String route) {
 		 // Init editor.
 		 routeEditor = routeDB.edit();
 		 // Add route.
-		 routeEditor.putString(routeId, route);
+		 routeEditor.putString(id, route);
 		 routeEditor.commit();
 	 }
 	 
@@ -42,6 +40,18 @@ public class RoutePreferences {
 		 // Get routes.
 		 // Return routes.
 		 return routeDB.getAll();
+	 }
+	 
+	 /**
+	  * Removes a route.
+	  * @param Route id.
+	  */
+	 public void removeRoute(String id) {
+		 // Init editor.
+		 routeEditor = routeDB.edit();
+		 // Remove route.
+		 routeEditor.remove(id);
+		 routeEditor.commit();
 	 }
 	
 }

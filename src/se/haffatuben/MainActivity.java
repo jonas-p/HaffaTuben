@@ -55,19 +55,17 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		RoutePreferences rp = new RoutePreferences(getApplicationContext());
 		Map<String, ?> routeMap = rp.getRoutes();
 		// Load Route objects.
-		routes = new ArrayList<Route>();
 		routeListItems = new ArrayList<RouteListItem>();
 		for (Map.Entry<String, ?> entry : routeMap.entrySet()) {
 			Route r = Route.create((String) entry.getValue());
-			routes.add(r);
 			routeListItems.add(new RouteListItem(r));
 		}
 		// Send routes to view.
 		displayRoutesFragment.setRoutes(routeListItems);
 		// Load trips for all routes.
 		boolean reverse = false; // TODO
-		for (Route route : routes) {
-			route.loadTrips(Volley.newRequestQueue(this), reverse, rc);
+		for (RouteListItem routeListItem : routeListItems) {
+			routeListItem.route.loadTrips(Volley.newRequestQueue(this), reverse, rc);
 		}
 	}
 
@@ -115,9 +113,8 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		// Serialize Route object.
 		String routeString = r.serialize();
 		// Put in SharedPreferences.
-		rp.addRoute(routeString);
-		// Append to route lists.
-		routes.add(r);
+		rp.addRoute(r.id, routeString);
+		// Append to route list.
 		routeListItems.add(new RouteListItem(r));
 		// Notify.
 		displayRoutesFragment.notifyRoutesDataChanged();

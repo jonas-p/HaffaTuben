@@ -17,7 +17,7 @@ import android.widget.TextView;
  */
 public class RouteListItem {
 	private boolean isExpanded;
-	private Route route;
+	public Route route;
 	
 	/**
 	 * Create a new RouteListItem

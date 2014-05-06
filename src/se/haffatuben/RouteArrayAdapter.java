@@ -3,12 +3,21 @@ package se.haffatuben;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 /**
  * ArrayAdapter for displaying route objects. The resource passed
@@ -61,6 +70,35 @@ public class RouteArrayAdapter extends ArrayAdapter<RouteListItem> {
 			expandableLayout.setVisibility(View.GONE);
 		}
 		
+		// Delete handler.
+		TextView trash = (TextView) convertView.findViewById(R.id.trash);
+		trash.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(final View v) {
+				ListView lv = (ListView) v.getParent().getParent();
+				final int position = lv.getPositionForView(v);
+				AlertDialog show = new AlertDialog.Builder(v.getContext())
+				.setTitle("Ta bort rutt")
+				.setMessage("Vill du ta bort rutten?")
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// Delete route.
+						RoutePreferences rp = new RoutePreferences(v.getContext());
+						rp.removeRoute(mData.get(position).route.id);
+						mData.remove(position);
+						v.setVisibility(View.GONE);
+						notifyDataSetChanged();
+						// Toast success.
+						Toast.makeText(v.getContext(), "Rutten raderades", Toast.LENGTH_SHORT).show();
+					}
+					
+				}).setNegativeButton("Nej", null).show();
+			}
+		});
 		return convertView;
 	}
 }
