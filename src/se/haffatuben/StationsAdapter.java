@@ -13,6 +13,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.OpenableColumns;
 import android.util.Log;
 
 /**
@@ -95,6 +96,10 @@ public class StationsAdapter {
 	 * Copy database from assets folder to the data directory
 	 */
 	private static void copyDatabase(Context context) throws IOException {
+		// check if databases directory exists and create it if it doesn't
+		File d = new File(getDbPath(context));
+		if (!d.exists()) { d.mkdir(); }
+		
 		String out = getDbPath(context) + DATABASE_NAME;
 		InputStream input = context.getAssets().open(DATABASE_NAME);
 		OutputStream output = new FileOutputStream(out);
