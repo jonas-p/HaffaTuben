@@ -13,12 +13,14 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 
 /**
  * DialogFragment for adding routes to the application. The
@@ -86,9 +88,8 @@ public class AddRouteDialogFragment extends DialogFragment {
 					int position, long id) {
 				// TODO: Error checking if item does not exist
 				String selected = adapter.getItem(position);
-				
 				stationA = sitesMap.get(selected);
-				// TODO: Check if should enable OK button
+				togglePositiveButton();
 			}
 		});
 		
@@ -98,9 +99,8 @@ public class AddRouteDialogFragment extends DialogFragment {
 					int position, long id) {
 				// TODO: Error checking if item does not exist
 				String selected = adapter.getItem(position);
-				
 				stationB = sitesMap.get(selected);
-				// TODO: Check if should enable OK button
+				togglePositiveButton();
 			}
 		});
 		
@@ -136,13 +136,13 @@ public class AddRouteDialogFragment extends DialogFragment {
 		stationB_ac.addTextChangedListener(textWatcher);
 		
 		// Create dialog
-		Builder dialog = new AlertDialog.Builder(getActivity());
-		dialog.setTitle(R.string.button_add_route);
-		dialog.setView(view);
-		dialog.setCancelable(true);
+		Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+		dialogBuilder.setTitle(R.string.button_add_route);
+		dialogBuilder.setView(view);
+		dialogBuilder.setCancelable(true);
 		
 		// Cancel/OK buttons
-		dialog.setPositiveButton(android.R.string.ok,
+		dialogBuilder.setPositiveButton(android.R.string.ok,
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -152,7 +152,7 @@ public class AddRouteDialogFragment extends DialogFragment {
 						}
 					}
 				});
-		dialog.setNegativeButton(android.R.string.cancel,
+		dialogBuilder.setNegativeButton(android.R.string.cancel,
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -160,7 +160,33 @@ public class AddRouteDialogFragment extends DialogFragment {
 					}
 				});
 		
-		return dialog.create();
+		// Create dialog and disable positive button		
+		return dialogBuilder.create();
+	}
+	
+	/**
+	 * Dialog has been created, disable positive button.
+	 */
+	@Override
+	public void onStart() {
+		super.onStart();
+		togglePositiveButton();
+	}
+	
+	/**
+	 * Toggles positive button on the condition that if
+	 * both stationA and stationB are set the button is enabled
+	 * otherwise it's disabled.
+	 */
+	private void togglePositiveButton() {
+		AlertDialog dialog = (AlertDialog) this.getDialog();
+		Button button = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+		
+		if (stationA == null || stationB == null) {
+			button.setEnabled(false);
+		} else {
+			button.setEnabled(true);
+		}
 	}
 	
 	/**
