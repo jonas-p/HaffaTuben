@@ -74,7 +74,7 @@ public class Route {
 		// Base URL.
 		String base = "https://api.trafiklab.se/samtrafiken/resrobot/Search.json?";
 		// URL Params.
-		String apiKey = "key=Zi5RGn9ZKWfqNxCZxvGdjMz6dErIf3Dr";
+		String apiKey = "key=94TSOTStVjWwbNWMnYFSGGzRGbA3nlGq";
 		// If reverse, change a, b.
 		String stations;
 		if (reverse) {

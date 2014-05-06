@@ -28,7 +28,7 @@
         android:text="" />
     
     <se.haffatuben.widgets.Icon
-        android:layout_below="@id/origin"
+        android:layout_below="@+id/expandableView"
         android:layout_alignParentRight="true"
         android:id="@+id/trash"
         android:layout_width="wrap_content"
