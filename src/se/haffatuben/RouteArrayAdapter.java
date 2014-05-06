@@ -77,7 +77,7 @@ public class RouteArrayAdapter extends ArrayAdapter<RouteListItem> {
 			@Override
 			public void onClick(final View v) {
 				ListView lv = (ListView) v.getParent().getParent();
-				int position = lv.getPositionForView(v);
+				final int position = lv.getPositionForView(v);
 				AlertDialog show = new AlertDialog.Builder(v.getContext())
 				.setTitle("Ta bort rutt")
 				.setMessage("Vill du ta bort rutten?")
@@ -86,15 +86,17 @@ public class RouteArrayAdapter extends ArrayAdapter<RouteListItem> {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						// TODO: Delete route.
-						
+						// Delete route.
+						RoutePreferences rp = new RoutePreferences(v.getContext());
+						rp.removeRoute(mData.get(position).route.id);
+						mData.remove(position);
+						v.setVisibility(View.GONE);
+						notifyDataSetChanged();
 						// Toast success.
 						Toast.makeText(v.getContext(), "Rutten raderades", Toast.LENGTH_SHORT).show();
 					}
 					
 				}).setNegativeButton("Nej", null).show();
-				// TODO Auto-generated method stub
-				System.out.println("TRASH CLICKED!");
 			}
 		});
 		return convertView;

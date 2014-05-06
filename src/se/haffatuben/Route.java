@@ -1,6 +1,7 @@
 package se.haffatuben;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +29,8 @@ public class Route {
 	// isLoading, returns true when object is loading trips
 	// default value is true
 	public boolean isLoading;
+	// Id.
+	public String id;
 	
 	/** Route.
 	 * Route constructor.
@@ -40,6 +43,9 @@ public class Route {
 		this.a = a;
 		this.b = b;
 		this.isLoading = true;
+		// Generate UUID.
+		Long routeLongId = UUID.randomUUID().getMostSignificantBits();
+		id = Long.toString(routeLongId);
 	}
 	
 	/**
