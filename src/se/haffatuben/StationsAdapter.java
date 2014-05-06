@@ -9,13 +9,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.OpenableColumns;
 import android.util.Log;
 
 /**
@@ -50,6 +49,7 @@ public class StationsAdapter {
 	 * Returns path to the data directory where the database is stored
 	 * @return
 	 */
+	@SuppressLint("SdCardPath")
 	private static String getDbPath(Context context) {
 		if (android.os.Build.VERSION.SDK_INT >= 4.2) {
 			return context.getApplicationInfo().dataDir + "/databases/";
@@ -129,6 +129,7 @@ public class StationsAdapter {
 	 * @param stationQuery search term
 	 * @return list of stations
 	 */
+	@SuppressLint("DefaultLocale")
 	public List<Station> getStations(String stationQuery) {
 		List<Station> matches = new ArrayList<Station>();
 		String query = "SELECT * FROM " + TABLE_NAME + " WHERE name_upper LIKE ? LIMIT 3";

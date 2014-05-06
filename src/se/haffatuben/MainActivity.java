@@ -35,7 +35,7 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		@Override
 		public void onRouteFailed(Error e) {
 			// Toast.
-			Toast toast = Toast.makeText(getApplicationContext(), "Resor kunde inte hämtas", Toast.LENGTH_SHORT);
+			Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.could_not_fetch_trips), Toast.LENGTH_SHORT);
 			toast.show();
 		}
 	};

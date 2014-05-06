@@ -1,7 +1,6 @@
 package se.haffatuben;
 
 import java.util.Map;
-import java.util.UUID;
 
 import android.app.Activity;
 import android.content.Context;
