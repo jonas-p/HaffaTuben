@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -130,15 +131,15 @@ public class StationsAdapter {
 	 */
 	public List<Station> getStations(String stationQuery) {
 		List<Station> matches = new ArrayList<Station>();
-		String query = "SELECT * FROM " + TABLE_NAME + " WHERE UPPER(name) LIKE UPPER(?) LIMIT 3";
-		stationQuery += "%";
+		String query = "SELECT * FROM " + TABLE_NAME + " WHERE name_upper LIKE ? LIMIT 3";
+		stationQuery = "%" + stationQuery + "%";
 		try {
 			stationQuery = new String(stationQuery.getBytes(), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			return matches;
 		}
 		try {
-			Cursor cursor = db.rawQuery(query, new String []{ stationQuery });
+			Cursor cursor = db.rawQuery(query, new String []{ stationQuery.toUpperCase(Locale.US) });
 			while (cursor.moveToNext()) {
 				String id = Integer.toString(cursor.getInt(0));
 				String name = cursor.getString(1);
