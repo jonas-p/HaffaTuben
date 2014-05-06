@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,19 +129,23 @@ public class StationsAdapter {
 	 * @return list of stations
 	 */
 	public List<Station> getStations(String stationQuery) {
+		List<Station> matches = new ArrayList<Station>();
 		String query = "SELECT * FROM " + TABLE_NAME + " WHERE UPPER(name) LIKE UPPER(?) LIMIT 3";
 		stationQuery += "%";
-		List<Station> matches = new ArrayList<Station>();
+		try {
+			stationQuery = new String(stationQuery.getBytes(), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			return matches;
+		}
 		try {
 			Cursor cursor = db.rawQuery(query, new String []{ stationQuery });
-			cursor.moveToFirst();
-			do {
+			while (cursor.moveToNext()) {
 				String id = Integer.toString(cursor.getInt(0));
 				String name = cursor.getString(1);
 				double lat = cursor.getDouble(2);
 				double lng = cursor.getDouble(3);
 				matches.add(new Station(name, id, lat, lng));
-			} while (cursor.moveToNext());
+			}
 		} catch (SQLException e) {
 			Log.e(TAG, "Failed to query database");
 		}
