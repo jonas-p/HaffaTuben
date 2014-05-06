@@ -2,24 +2,17 @@ package se.haffatuben;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.android.volley.Request.Method;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
+import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -38,13 +31,13 @@ import android.widget.AutoCompleteTextView;
  */
 public class AddRouteDialogFragment extends DialogFragment {
 	public static final String REQUEST_TAG = "typeahead-request";
-	private static final String TAG = "AppRouteDialogFragment";
 	
-	// Volley request queue
-	protected RequestQueue requestQueue;
+	// Database
+	protected StationsAdapter stations;
+	protected FetchStationsAsync fetchTask;
 	
 	// Sites
-	protected HashMap<String, JSONObject> sitesMap;
+	protected HashMap<String, Station> sitesMap;
 	protected ArrayList<String> sites;
 	protected Station stationA;
 	protected Station stationB;
@@ -53,7 +46,7 @@ public class AddRouteDialogFragment extends DialogFragment {
 	protected ArrayAdapter<String> adapter;
 	
 	public AddRouteDialogFragment() {
-		sitesMap = new HashMap<String, JSONObject>();
+		sitesMap = new HashMap<String, Station>();
 		sites = new ArrayList<String>();
 	}
 	
@@ -74,7 +67,7 @@ public class AddRouteDialogFragment extends DialogFragment {
 	
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		requestQueue = Volley.newRequestQueue(getActivity());
+		stations = new StationsAdapter(getActivity());
 		
 		// Inflate view
 		LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -94,7 +87,7 @@ public class AddRouteDialogFragment extends DialogFragment {
 				// TODO: Error checking if item does not exist
 				String selected = adapter.getItem(position);
 				
-				stationA = new Station(sitesMap.get(selected));
+				stationA = sitesMap.get(selected);
 				// TODO: Check if should enable OK button
 			}
 		});
@@ -106,21 +99,41 @@ public class AddRouteDialogFragment extends DialogFragment {
 				// TODO: Error checking if item does not exist
 				String selected = adapter.getItem(position);
 				
-				stationB = new Station(sitesMap.get(selected));
+				stationB = sitesMap.get(selected);
 				// TODO: Check if should enable OK button
 			}
 		});
 		
-		
-		TimedTextWatcher watcher = new TimedTextWatcher(1000) {
+		/**
+		 * TextWatcher to help listen on changes on the TextViews
+		 * so we can fetch suggestions from the stations database.
+		 */
+		TextWatcher textWatcher = new TextWatcher() {
 			@Override
-			public void exceededTimeSinceLastChange(CharSequence s) {
-				updateSites(s.toString());
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				if (fetchTask != null) {
+					fetchTask.cancel(true);
+				}
+				fetchTask = new FetchStationsAsync(s.toString());
+				fetchTask.execute();
+			}
+			
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
 			}
 		};
 		
-		stationA_ac.addTextChangedListener(watcher);
-		stationB_ac.addTextChangedListener(watcher);
+		// Add listeners
+		stationA_ac.addTextChangedListener(textWatcher);
+		stationB_ac.addTextChangedListener(textWatcher);
 		
 		// Create dialog
 		Builder dialog = new AlertDialog.Builder(getActivity());
@@ -151,62 +164,47 @@ public class AddRouteDialogFragment extends DialogFragment {
 	}
 	
 	/**
-	 * This method requests sites from SL API using the query parameter and
-	 * updates the Adapters connected to the AutoCompleteTextViews inside
-	 * the Fragment.
-	 * 
-	 * @param query Site query parameter
+	 * FetchStationsAsync fetches stations from the SQLite database
+	 * asynchronously. When done the sitesMap and adapter is updated
+	 * and notified so the AutoCompleteTextViews can display suggestions.
+	 * @author jonas
+	 *
 	 */
-	protected void updateSites(final String query) {
-		// TODO: Move to config
-		String url = "https://api.trafiklab.se/samtrafiken/resrobot/FindLocation.json?key=94TSOTStVjWwbNWMnYFSGGzRGbA3nlGq&coordSys=WGS84&apiVersion=2.1&from=" + query;
+	private class FetchStationsAsync extends AsyncTask<Void, Void, Void> {
+		private String query;
+		private List<Station> result;
 		
-		// Cancel all previous requests
-		requestQueue.cancelAll(REQUEST_TAG);
+		/**
+		 * Initialize a new object.
+		 * @param query Search query
+		 */
+		public FetchStationsAsync(String query) {
+			this.query = query;
+		}
+
+		/**
+		 * Fetch stations from the database
+		 */
+		@Override
+		protected Void doInBackground(Void... params) {
+			result = stations.getStations(query);
+			return null;
+		}
 		
-		if (query.length() == 0) return;
-
-		JsonRequestISO req = new JsonRequestISO(Method.GET, url, null,
-				new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-				sitesMap.clear();
-				adapter.clear();
-				
-				try {
-					JSONObject jsonSites = response.getJSONObject("findlocationresult")
-							.getJSONObject("from");
-					
-					if (jsonSites.has("location")) {
-						JSONArray sites = jsonSites.getJSONArray("location");
-						for (int i = 0; i < sites.length(); i++) {
-							JSONObject site = sites.getJSONObject(i);
-							String name = site.getString("displayname");
-							
-							adapter.add(name);
-							sitesMap.put(name, site);
-						}
-					}
-				} catch (JSONException e) {
-					// TODO: Error parsing
-					Log.d(TAG, "Error parsing");
-				}
-				
-				// Update view
-				adapter.notifyDataSetChanged();
-				adapter.getFilter().filter(query);
+		/**
+		 * Clear adapter and add the new matches and notify
+		 * that the data has changed.
+		 */
+		@Override
+		protected void onPostExecute(Void v) {
+			adapter.clear();
+			for (Station s : result) {
+				adapter.add(s.name);
+				sitesMap.put(s.name, s);
 			}
-		},
-		new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				// TODO: Display error message
-				Log.d(TAG, error.toString());
-			}
-		});
-
-		req.setTag(REQUEST_TAG);
-		requestQueue.add(req);
-		Log.d(TAG, "Typeahead request sent");
+			adapter.notifyDataSetChanged();
+			adapter.getFilter().filter(query);
+		}
+		
 	}
 }
