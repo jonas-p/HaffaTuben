@@ -9,6 +9,10 @@ import se.haffatuben.AddRouteDialogFragment.AddRouteResultReciever;
 import se.haffatuben.Route.RouteLoadedReciever;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -16,7 +20,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-public class MainActivity extends ActionBarActivity implements AddRouteResultReciever {
+public class MainActivity extends ActionBarActivity implements AddRouteResultReciever, LocationListener {
+	// Location
+	Location location;
+	LocationManager locationManager;
 	// ArrayList containing Route objects.
 	ArrayList<Route> routes;
 	ArrayList<RouteListItem> routeListItems;
@@ -51,8 +58,33 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.container, displayRoutesFragment).commit();
 		}
-		// Load trips.
-		loadAllTrips();
+		
+		// Add trips to views
+		addAllTrips();
+
+		// Location
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+		
+		if (!isGPSEnabled && !isNetworkEnabled) {
+			// Can't get location, use regular routes
+			loadAllTrips();
+		} else {
+			if (isGPSEnabled) {
+				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+						60000, // Every one minute
+						10,	   // or every ten meters
+						this);
+				Log.d("", "LocationManager requesting GPS location updates");
+			} else {
+				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+						60000, // One minute
+						10, // 10 meters
+						this);
+				Log.d("", "LocationManager requesting GPS location updates");
+			}
+		}
 	}
 
 	@Override
@@ -75,11 +107,10 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 	}
 	
 	/**
-	 * Load trips.
-	 * 
+	 * Add trips to view. This method does not do any trip loading.
 	 */
-	public void loadAllTrips() {
-		// Load Routes.
+	public void addAllTrips() {
+		// Load Routes from storage
 		RoutePreferences rp = new RoutePreferences(getApplicationContext());
 		Map<String, ?> routeMap = rp.getRoutes();
 		// Load Route objects.
@@ -90,10 +121,24 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		}
 		// Send routes to view.
 		displayRoutesFragment.setRoutes(routeListItems);
+	}
+	
+	/**
+	 * Load trips.
+	 * 
+	 */
+	public void loadAllTrips() {
 		// Load trips for all routes.
-		boolean reverse = false; // TODO
 		for (RouteListItem routeListItem : routeListItems) {
-			routeListItem.route.loadTrips(Volley.newRequestQueue(this), reverse, rc);
+			Route route = routeListItem.route;
+			boolean reverse = false;
+			if (location != null) {
+				// we have a location, find the closes station and reverse route if necessary
+				if (location.distanceTo(route.a.getLocation()) > location.distanceTo(route.b.getLocation())) {
+					reverse = true;
+				}
+			}
+			route.loadTrips(Volley.newRequestQueue(this), reverse, rc);
 		}
 	}
 	
@@ -130,5 +175,34 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		// Load trips.
 		boolean reverse = false; // TODO
 		r.loadTrips(Volley.newRequestQueue(this), reverse, rc);
+	}
+
+	/**
+	 * This gets called when we receive a location update from
+	 * either the GPS provider or network provider. When we have
+	 * a location we stop requesting more updates and then load
+	 * trips.
+	 */
+	@Override
+	public void onLocationChanged(Location location) {
+		Log.d("", "LocationManager Location changed");
+		this.location = location;
+		// we only need one location so stop requesting further
+		locationManager.removeUpdates(this);
+		
+		// load trips
+		loadAllTrips();
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
 	}
 }

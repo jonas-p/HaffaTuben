@@ -35,13 +35,23 @@ public class DisplayRoutesFragment extends Fragment {
 	 */
 	public void setRoutes(List<RouteListItem> routes) {
 		this.routes = routes;
+		// if the adapter has been initialize, readd all routes to it
+		if (adapter != null) {
+			adapter.clear();
+			for (RouteListItem route : this.routes) {
+				adapter.add(route);
+			}
+		}
+		notifyRoutesDataChanged();
 	}
 	
 	/**
 	 * Notify list view adapter that the data source has changed
 	 */
 	public void notifyRoutesDataChanged() {
-		adapter.notifyDataSetChanged();
+		if (adapter != null) {
+			adapter.notifyDataSetChanged();
+		}
 	}
 
 	@Override

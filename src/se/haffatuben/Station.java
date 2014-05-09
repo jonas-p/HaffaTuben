@@ -3,6 +3,8 @@ package se.haffatuben;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.location.Location;
+
 /**
  * Station model.
  * A station has the same ID as station in SL API.
@@ -32,6 +34,17 @@ public class Station {
 		this.id = id;
 		this.lat = lat;
 		this.lng = lng;
+	}
+	
+	/**
+	 * Returns a Location object holding the stations location
+	 * @return
+	 */
+	public Location getLocation() {
+		Location location = new Location(this.name);
+		location.setLatitude(this.lat);
+		location.setLongitude(this.lng);
+		return location;
 	}
 	
 	/**

@@ -61,8 +61,17 @@ public class RouteListItem {
 		TextView textView3 = (TextView) view.findViewById(R.id.departureTime);
 		
 		// TODO: Use strings from strings.xml
-		textView.setText(route.b.name.replaceAll("\\(.+", ""));
-		textView2.setText(context.getString(R.string.from) + " " + route.a.name.replaceAll("\\(.+", ""));
+		String to;
+		String from;
+		if (route.isReversed) {
+			to = route.a.name.replaceAll("\\(.+", "");
+			from = route.b.name.replaceAll("\\(.+", "");
+		} else {
+			to = route.b.name.replaceAll("\\(.+", "");
+			from = route.a.name.replaceAll("\\(.+", "");
+		}
+		textView.setText(to);
+		textView2.setText(context.getString(R.string.from) + " " + from);
 		
 		// Check if there is any trips.
 		if (route.trips.size() == 0) {
@@ -113,7 +122,11 @@ public class RouteListItem {
 		TextView icon = (TextView) view.findViewById(R.id.icon);
 		
 		// Set text views.
-		title.setText(route.b.name.replaceAll("\\(.+", ""));
+		Station to = route.b;
+		if (route.isReversed) {
+			to = route.a;
+		}
+		title.setText(to.name.replaceAll("\\(.+", ""));
 		departureTime.setText((route.trips.get(position).departure.getTime() - System.currentTimeMillis())/60000 + " min");
 		icon.setText(route.trips.get(position).type.iconString);
 		return view;

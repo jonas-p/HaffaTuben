@@ -26,11 +26,13 @@ public class Route {
 	public Station a, b;
 	// ArrayList for Trip storage.
 	public ArrayList<Trip> trips = new ArrayList<Trip>();
+	// Id.
+	public String id;
 	// isLoading, returns true when object is loading trips
 	// default value is true
 	public boolean isLoading;
-	// Id.
-	public String id;
+	// isReversed is true if loadTrips was called with reverse = true
+	public boolean isReversed;
 	
 	/** Route.
 	 * Route constructor.
@@ -101,6 +103,7 @@ public class Route {
 	 */
 	public void loadTrips(RequestQueue queue, boolean reverse, final RouteLoadedReciever rc) {
 		isLoading = true;
+		isReversed = reverse;
 		// Build request URL.
 		String url = buildRequestURL(reverse);
 		// Make request.
