@@ -51,22 +51,8 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.container, displayRoutesFragment).commit();
 		}
-		// Load Routes.
-		RoutePreferences rp = new RoutePreferences(getApplicationContext());
-		Map<String, ?> routeMap = rp.getRoutes();
-		// Load Route objects.
-		routeListItems = new ArrayList<RouteListItem>();
-		for (Map.Entry<String, ?> entry : routeMap.entrySet()) {
-			Route r = Route.create((String) entry.getValue());
-			routeListItems.add(new RouteListItem(r));
-		}
-		// Send routes to view.
-		displayRoutesFragment.setRoutes(routeListItems);
-		// Load trips for all routes.
-		boolean reverse = false; // TODO
-		for (RouteListItem routeListItem : routeListItems) {
-			routeListItem.route.loadTrips(Volley.newRequestQueue(this), reverse, rc);
-		}
+		// Load trips.
+		loadAllTrips();
 	}
 
 	@Override
@@ -86,6 +72,29 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	/**
+	 * Load trips.
+	 * 
+	 */
+	public void loadAllTrips() {
+		// Load Routes.
+		RoutePreferences rp = new RoutePreferences(getApplicationContext());
+		Map<String, ?> routeMap = rp.getRoutes();
+		// Load Route objects.
+		routeListItems = new ArrayList<RouteListItem>();
+		for (Map.Entry<String, ?> entry : routeMap.entrySet()) {
+			Route r = Route.create((String) entry.getValue());
+			routeListItems.add(new RouteListItem(r));
+		}
+		// Send routes to view.
+		displayRoutesFragment.setRoutes(routeListItems);
+		// Load trips for all routes.
+		boolean reverse = false; // TODO
+		for (RouteListItem routeListItem : routeListItems) {
+			routeListItem.route.loadTrips(Volley.newRequestQueue(this), reverse, rc);
+		}
 	}
 	
 	/**

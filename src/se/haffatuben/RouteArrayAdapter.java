@@ -86,8 +86,8 @@ public class RouteArrayAdapter extends ArrayAdapter<RouteListItem> {
 					public void onClick(DialogInterface dialog, int which) {
 						// Delete route.
 						RoutePreferences rp = new RoutePreferences(v.getContext());
-						rp.removeRoute(data.get(position).route.id);
-						data.remove(position);
+						rp.removeRoute(data.get(position-1).route.id);
+						data.remove(position-1);
 						v.setVisibility(View.GONE);
 						notifyDataSetChanged();
 						// Toast success.
