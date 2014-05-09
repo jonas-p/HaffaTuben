@@ -109,6 +109,8 @@ public class Route {
 					// On response from API.
 					@Override
 					public void onResponse(JSONObject response) {
+						// Clear trips.
+						trips.clear();
 						// Get Trips array.
 						try {
 							JSONArray tripArray = ((JSONObject) response.get("timetableresult")).getJSONArray("ttitem");
