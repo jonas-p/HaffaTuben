@@ -3,7 +3,6 @@ package se.haffatuben;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.android.volley.toolbox.Volley;
 import com.markupartist.android.widget.PullToRefreshListView;
 import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
 
