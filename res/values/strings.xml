@@ -7,6 +7,11 @@
     <string name="station_a_hint">Station A</string>
     <string name="station_b_hint">Station B</string>
     <string name="from">from</string>
+    <string name="could_not_fetch_trips">Could not fetch trips</string>
+    <string name="delete_route">Delete route</string>
+    <string name="route_are_you_sure">Do you want to remove the route?</string>
+    <string name="route_deleted">Route deleted</string>
+    
     <!-- Icons -->
     <string name="icon_train">a</string>
     <string name="icon_bus">b</string>

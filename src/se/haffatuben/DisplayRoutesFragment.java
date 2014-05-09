@@ -14,7 +14,6 @@ import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.TextView;
 
 public class DisplayRoutesFragment extends Fragment {
 	private ListView listView;
