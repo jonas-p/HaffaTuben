@@ -3,6 +3,10 @@ package se.haffatuben;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.android.volley.toolbox.Volley;
+import com.markupartist.android.widget.PullToRefreshListView;
+import com.markupartist.android.widget.PullToRefreshListView.OnRefreshListener;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar.LayoutParams;
@@ -62,7 +66,7 @@ public class DisplayRoutesFragment extends Fragment {
 					// Hide trash icon.
 					view.findViewById(R.id.trash).setVisibility(View.GONE);
 					
-					routes.get(position).setExpanded(false);
+					routes.get(position-1).setExpanded(false);
 					
 					final int initialHeight = ev.getMeasuredHeight();
 					Animation a = new Animation() {
@@ -85,7 +89,7 @@ public class DisplayRoutesFragment extends Fragment {
 					a.setDuration(250);
 					ev.startAnimation(a);
 				} else {
-					routes.get(position).setExpanded(true);
+					routes.get(position-1).setExpanded(true);
 					// Show trash icon.
 					view.findViewById(R.id.trash).setVisibility(View.VISIBLE);
 					
@@ -115,6 +119,15 @@ public class DisplayRoutesFragment extends Fragment {
 			}
 		});
 		
+		// Pull to refresh listener.
+		((PullToRefreshListView) listView).setOnRefreshListener(new OnRefreshListener() {
+		    @Override
+		    public void onRefresh() {
+		        // Refresh trips.
+		    	notifyRoutesDataChanged();
+		    	((PullToRefreshListView) listView).onRefreshComplete();
+		    }
+		});
 		return rootView;
 	}
 	

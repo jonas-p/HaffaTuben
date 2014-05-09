@@ -5,7 +5,7 @@
     android:orientation="vertical"
     tools:context="se.haffatuben.DisplayRoutesFragment" >
     
-    <ListView
+    <com.markupartist.android.widget.PullToRefreshListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="0dip"
@@ -16,7 +16,7 @@
         android:padding="10dp"
         android:clipToPadding="false"
         android:scrollbarStyle="outsideOverlay" >
-    </ListView>
+    </com.markupartist.android.widget.PullToRefreshListView>
 
     <Button
         android:id="@+id/addRoute"
