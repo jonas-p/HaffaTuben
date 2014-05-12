@@ -3,6 +3,7 @@ package se.haffatuben;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
 import se.haffatuben.AddRouteDialogFragment.AddRouteResultReciever;
@@ -29,6 +30,9 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 	ArrayList<RouteListItem> routeListItems;
 	// DisplayRoutesFragment.
 	DisplayRoutesFragment displayRoutesFragment;
+	
+	// Request queue for volley
+	RequestQueue requestQueue;
 	
 	// RouteLoadedReciever.
 	RouteLoadedReciever rc = new RouteLoadedReciever() {
@@ -58,6 +62,9 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.container, displayRoutesFragment).commit();
 		}
+		
+		// Initialize queue
+		requestQueue = Volley.newRequestQueue(this);
 		
 		// Add trips to views
 		addAllTrips();
@@ -138,7 +145,7 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 					reverse = true;
 				}
 			}
-			route.loadTrips(Volley.newRequestQueue(this), reverse, rc);
+			route.loadTrips(requestQueue, reverse, rc);
 		}
 	}
 	
@@ -177,7 +184,7 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		if (location != null && location.distanceTo(r.a.getLocation()) > location.distanceTo(r.b.getLocation())) {
 			reverse = true;
 		}
-		r.loadTrips(Volley.newRequestQueue(this), reverse, rc);
+		r.loadTrips(requestQueue, reverse, rc);
 	}
 
 	/**
