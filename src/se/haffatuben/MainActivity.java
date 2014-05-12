@@ -173,7 +173,10 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		// Notify.
 		displayRoutesFragment.notifyRoutesDataChanged();
 		// Load trips.
-		boolean reverse = false; // TODO
+		boolean reverse = false;
+		if (location != null && location.distanceTo(r.a.getLocation()) > location.distanceTo(r.b.getLocation())) {
+			reverse = true;
+		}
 		r.loadTrips(Volley.newRequestQueue(this), reverse, rc);
 	}
 
