@@ -1,6 +1,8 @@
 package se.haffatuben;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 
 import com.android.volley.RequestQueue;
@@ -131,8 +133,8 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 	}
 	
 	/**
-	 * Load trips.
-	 * 
+	 * Start loading trips for all routes and sort the array by calling
+	 * sortTrips()
 	 */
 	public void loadAllTrips() {
 		// Load trips for all routes.
@@ -147,6 +149,53 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 			}
 			route.loadTrips(requestQueue, reverse, rc);
 		}
+		
+		sortTrips();
+	}
+	
+	/**
+	 * Sorts routeListItems if we have a location. Order is
+	 * from closest FROM station. When done this method
+	 * notifies the displayfragment in order to refresh listview.
+	 */
+	public void sortTrips() {
+		if (location == null) return;
+		
+		Collections.sort(routeListItems, new RouteListItemComparator());
+		displayRoutesFragment.notifyRoutesDataChanged();
+		
+		for (RouteListItem item : routeListItems) {
+			if (item.route.isReversed) Log.d("", item.route.b.name);
+			else Log.d("", item.route.a.name);
+		}
+	}
+	
+	/**
+	 * Comparator for RouteListItem. Returns -1 if the FROM station is
+	 * closer to location than the TO station. 0 if it has the same location
+	 * or 1 if TO station is closer than FROM station. FROM station is station
+	 * a and TO station is station b. If the route is reversed the stations
+	 * are also reversed.
+	 */
+	public class RouteListItemComparator implements Comparator<RouteListItem> {
+
+		@Override
+		public int compare(RouteListItem lhs, RouteListItem rhs) {
+			if (location == null) return -1;
+			float a_distance;
+			float b_distance;
+			
+			if (lhs.route.isReversed) a_distance = location.distanceTo(lhs.route.b.getLocation());
+			else a_distance = location.distanceTo(lhs.route.a.getLocation());
+			
+			if (rhs.route.isReversed) b_distance = location.distanceTo(rhs.route.b.getLocation());
+			else b_distance = location.distanceTo(rhs.route.a.getLocation());
+			
+			if (a_distance < b_distance) return -1;
+			else if (b_distance < a_distance) return 1;
+			return 0;
+		}
+		
 	}
 	
 	/**
@@ -177,20 +226,21 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 		rp.addRoute(r.id, routeString);
 		// Append to route list.
 		routeListItems.add(new RouteListItem(r));
-		// Notify.
-		displayRoutesFragment.notifyRoutesDataChanged();
 		// Load trips.
 		boolean reverse = false;
 		if (location != null && location.distanceTo(r.a.getLocation()) > location.distanceTo(r.b.getLocation())) {
 			reverse = true;
 		}
 		r.loadTrips(requestQueue, reverse, rc);
+		
+		// Sort (which notifies)
+		sortTrips();
 	}
 
 	/**
 	 * This gets called when we receive a location update from
 	 * either the GPS provider or network provider. When we have
-	 * a location we stop requesting more updates and then load
+	 * a location we stop requesting more updates and then load	
 	 * trips.
 	 */
 	@Override
