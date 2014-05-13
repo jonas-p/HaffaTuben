@@ -56,19 +56,21 @@ public class RouteArrayAdapter extends ArrayAdapter<RouteListItem> {
 		
 		LinearLayout expandableLayout = (LinearLayout) convertView.findViewById(R.id.expandableView);
 		expandableLayout.removeAllViews();
+		TextView trash = (TextView) convertView.findViewById(R.id.trash);
 		
 		// Pass the view to the RotueListItem object
 		data.get(position).updateView(getContext(), convertView);
 		
 		// Show / Hide the expandable view
 		if (data.get(position).isExpanded()) {
+			trash.setVisibility(View.VISIBLE);
 			expandableLayout.setVisibility(View.VISIBLE);
 		} else {
+			trash.setVisibility(View.GONE);
 			expandableLayout.setVisibility(View.GONE);
 		}
 		
 		// Delete handler.
-		TextView trash = (TextView) convertView.findViewById(R.id.trash);
 		trash.setOnClickListener(new OnClickListener() {
 
 			@Override
