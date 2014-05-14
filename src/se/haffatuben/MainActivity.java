@@ -177,7 +177,10 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 	 * notifies the displayfragment in order to refresh listview.
 	 */
 	public void sortTrips() {
-		if (location == null) return;
+		if (location == null) {
+			displayRoutesFragment.notifyRoutesDataChanged();
+			return;
+		}
 		
 		Collections.sort(routeListItems, new RouteListItemComparator());
 		displayRoutesFragment.notifyRoutesDataChanged();
