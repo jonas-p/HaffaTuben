@@ -65,6 +65,39 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 					.add(R.id.container, displayRoutesFragment).commit();
 		}
 		
+		setupTrips();
+	}
+	
+	@Override
+	public void onRestart() {
+		super.onRestart();
+		setupTrips();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	/**
+	 * Create listview items and try to load trips using GPS position. If no
+	 * GPS is available load trips with regular routes.
+	 */
+	public void setupTrips() {
 		// Initialize queue
 		requestQueue = Volley.newRequestQueue(this);
 		
@@ -94,25 +127,6 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 				Log.d("", "LocationManager requesting GPS location updates");
 			}
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
 	}
 	
 	/**
