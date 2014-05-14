@@ -56,6 +56,10 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// remove icon from action bar
+		getActionBar().setDisplayShowHomeEnabled(false);
+		
 		setContentView(R.layout.activity_main);
 		// Initialize DisplayRoutesFragment.
 		displayRoutesFragment = new DisplayRoutesFragment();
@@ -65,7 +69,7 @@ public class MainActivity extends ActionBarActivity implements AddRouteResultRec
 					.add(R.id.container, displayRoutesFragment).commit();
 		}
 		
-		setupTrips();
+		setupTrips(); 
 	}
 	
 	@Override
