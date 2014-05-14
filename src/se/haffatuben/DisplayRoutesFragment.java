@@ -133,7 +133,8 @@ public class DisplayRoutesFragment extends Fragment {
 		    @Override
 		    public void onRefresh() {
 		        // Refresh trips.
-		    	// TODO Load trips.
+		    	// Load trips.
+		    	((MainActivity) getActivity()).loadAllTrips();
 		    	notifyRoutesDataChanged();
 		    	((PullToRefreshListView) listView).onRefreshComplete();
 		    }
